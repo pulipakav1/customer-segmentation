@@ -1,6 +1,6 @@
 # Customer Segmentation — RFM Analysis
 
-> Segmented 9,943 SaaS customers into 4 actionable groups using RFM scoring and K-means clustering — revealing that 1,152 Champions generate 35.5% of total revenue while 4,400 At-Risk customers represent the single largest retention opportunity across the entire customer base.
+> Segmented 9,943 SaaS customers into 4 actionable groups using RFM scoring and K-means clustering — revealing that 1,152 Champions generate 35.5% of total revenue while 4,400 At-Risk customers represent the single largest retention opportunity. Cluster count validated via elbow method and silhouette score. LTV estimated per segment to prioritize retention spend.
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
 ![sklearn](https://img.shields.io/badge/ML-scikit--learn-orange)
@@ -45,8 +45,14 @@
 
 **Clustering:**
 - Features standardized using StandardScaler before clustering
-- K-means with k=4 — chosen based on elbow method across k=2 to k=8
-- Segments labelled based on cluster centroid profiles
+- K-means with k=4 — validated using both elbow method (inertia) and silhouette score across k=2 to k=8 (see `reports/cluster_validation.png`)
+- Segment labels derived from cluster centroid rankings — no hardcoded thresholds
+
+**LTV Estimation:**
+- Average monthly spend per customer computed from payment history
+- Active months estimated from recency relative to dataset window
+- Estimated LTV = avg monthly spend × active months, aggregated per segment
+- Output: `reports/ltv_by_segment.csv`
 
 **Data:**
 - 9,943 customers with at least one successful payment
@@ -71,14 +77,16 @@
 customer_segmentation/
 │
 ├── src/
-│   └── rfm_analysis.py         # RFM scoring, K-means clustering, visualizations
+│   └── rfm_analysis.py         # RFM scoring, K-means, validation, LTV estimation
 ├── data/
 │   ├── customers.csv           # 10,000 customers
 │   ├── payments.csv            # 300K+ payment records
 │   └── subscriptions.csv       # 10,000 subscriptions
 ├── reports/
-│   ├── rfm_segments.png        # Segment visualizations
-│   └── rfm_scores.csv          # Per-customer RFM scores and segment labels
+│   ├── rfm_segments.png        # Segment count, revenue, LTV, scatter plots, heatmap
+│   ├── cluster_validation.png  # Elbow + silhouette score charts
+│   ├── rfm_scores.csv          # Per-customer RFM scores and segment labels
+│   └── ltv_by_segment.csv      # Estimated LTV per segment
 └── README.md
 ```
 
